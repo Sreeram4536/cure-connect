@@ -6,7 +6,7 @@ import { connectDB } from './config/mongodb';
 import connectCloudinary from './config/cloudinary';
 import adminRouter from "./routes/adminRoute";
 import doctorRouter from "./routes/doctorRoute";
-import userRouter from "./routes/userRoute";
+import userRouter from "./routes/UserRoute";
 import authRouter from "./routes/authRoute";
 import "./utils/passport";
 import passport from "passport";

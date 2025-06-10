@@ -14,5 +14,6 @@ doctorRouter.patch(
   "/availability",
   doctorController.changeAvailability.bind(doctorController)
 );
+doctorRouter.post("/login", doctorController.loginDoctor.bind(doctorController));
 
 export default doctorRouter;

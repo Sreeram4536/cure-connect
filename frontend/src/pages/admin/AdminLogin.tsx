@@ -91,7 +91,7 @@ const Login = () => {
               Login
             </button>
 
-            {state === "Admin" ? (
+            {/* {state === "Admin" ? (
               <p>
                 Doctor Login?{" "}
                 <span
@@ -111,7 +111,7 @@ const Login = () => {
                   Click here
                 </span>
               </p>
-            )}
+            )} */}
           </div>
         </div>
       </form>

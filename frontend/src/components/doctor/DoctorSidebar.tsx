@@ -1,14 +1,14 @@
 import React from "react";
-import { assets } from "../../assets/admin/assets";
 import { NavLink } from "react-router-dom";
+import { assets } from "../../assets/assets"; // Adjust path as needed for your doctor icons
 
-const AdminSidebar = () => {
+const DoctorSidebar = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-600 via-blue-500 to-blue-400 flex flex-col items-center py-6 px-2">
       {/* Logo Area */}
       <div className="mb-8 flex flex-col items-center">
-        <img src={assets.home_icon} alt="Logo" className="w-12 h-12 mb-2" />
-        <span className="text-white text-2xl font-bold tracking-wide">Admin</span>
+        <img src={assets.mylogo || assets.profile_pic} alt="Logo" className="w-12 h-12 mb-2" />
+        <span className="text-white text-2xl font-bold tracking-wide">Doctor</span>
         <span className="text-blue-200 text-xs font-light">Dashboard</span>
       </div>
       {/* Sidebar Card */}
@@ -20,7 +20,7 @@ const AdminSidebar = () => {
                 isActive ? "bg-blue-100 text-blue-700 shadow border-l-4 border-blue-500" : ""
               }`
             }
-            to="/admin/dashboard"
+            to="/doctor/dashboard"
           >
             <img src={assets.home_icon} alt="" className="w-5 h-5" />
             <p>Dashboard</p>
@@ -32,21 +32,9 @@ const AdminSidebar = () => {
                 isActive ? "bg-blue-100 text-blue-700 shadow border-l-4 border-blue-500" : ""
               }`
             }
-            to="/admin/user-management"
+            to="/doctor/appointments"
           >
-            <img src={assets.people_icon} alt="" className="w-5 h-5" />
-            <p>Manage Users</p>
-          </NavLink>
-
-          <NavLink
-            className={({ isActive }) =>
-              `flex items-center gap-3 py-3.5 px-6 rounded-lg mb-2 transition-all duration-200 cursor-pointer font-medium text-base hover:bg-blue-50 hover:text-blue-700 ${
-                isActive ? "bg-blue-100 text-blue-700 shadow border-l-4 border-blue-500" : ""
-              }`
-            }
-            to="/admin/appointments"
-          >
-            <img src={assets.appointment_icon} alt="" className="w-5 h-5" />
+            <img src={assets.appointment_icon || assets.home_icon} alt="" className="w-5 h-5" />
             <p>Appointments</p>
           </NavLink>
 
@@ -56,10 +44,10 @@ const AdminSidebar = () => {
                 isActive ? "bg-blue-100 text-blue-700 shadow border-l-4 border-blue-500" : ""
               }`
             }
-            to="/admin/add-doctor"
+            to="/doctor/patients"
           >
-            <img src={assets.add_icon} alt="" className="w-5 h-5" />
-            <p>Add Doctor</p>
+            <img src={assets.people_icon || assets.home_icon} alt="" className="w-5 h-5" />
+            <p>Patients</p>
           </NavLink>
 
           <NavLink
@@ -68,10 +56,10 @@ const AdminSidebar = () => {
                 isActive ? "bg-blue-100 text-blue-700 shadow border-l-4 border-blue-500" : ""
               }`
             }
-            to="/admin/update-doctor"
+            to="/doctor/wallet"
           >
-            <img src={assets.people_icon} alt="" className="w-5 h-5" />
-            <p>Update Doctor</p>
+            <img src={assets.wallet_icon || assets.home_icon} alt="" className="w-5 h-5" />
+            <p>Wallet</p>
           </NavLink>
 
           <NavLink
@@ -80,10 +68,10 @@ const AdminSidebar = () => {
                 isActive ? "bg-blue-100 text-blue-700 shadow border-l-4 border-blue-500" : ""
               }`
             }
-            to="/admin/all-doctors"
+            to="/doctor/messages"
           >
-            <img src={assets.people_icon} alt="" className="w-5 h-5" />
-            <p>Doctor List</p>
+            <img src={assets.appointment_icon || assets.home_icon} alt="" className="w-5 h-5" />
+            <p>Messages</p>
           </NavLink>
 
           <NavLink
@@ -92,10 +80,22 @@ const AdminSidebar = () => {
                 isActive ? "bg-blue-100 text-blue-700 shadow border-l-4 border-blue-500" : ""
               }`
             }
-            to="/admin/inbox"
+            to="/doctor/profile"
           >
-            <img src={assets.appointment_icon} alt="" className="w-5 h-5" />
-            <p>Inbox</p>
+            <img src={assets.profile_pic || assets.home_icon} alt="" className="w-5 h-5 rounded-full" />
+            <p>Profile</p>
+          </NavLink>
+
+          <NavLink
+            className={({ isActive }) =>
+              `flex items-center gap-3 py-3.5 px-6 rounded-lg mb-2 transition-all duration-200 cursor-pointer font-medium text-base hover:bg-blue-50 hover:text-blue-700 ${
+                isActive ? "bg-blue-100 text-blue-700 shadow border-l-4 border-blue-500" : ""
+              }`
+            }
+            to="/doctor/logout"
+          >
+            <img src={assets.cross_icon || assets.home_icon} alt="" className="w-5 h-5" />
+            <p>Logout</p>
           </NavLink>
         </ul>
       </div>
@@ -103,4 +103,4 @@ const AdminSidebar = () => {
   );
 };
 
-export default AdminSidebar;
+export default DoctorSidebar; 

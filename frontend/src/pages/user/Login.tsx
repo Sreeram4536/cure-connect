@@ -485,7 +485,7 @@ const Login = () => {
                 type="text"
                 onChange={(e) => setName(e.target.value)}
                 value={name}
-                required
+                // required
               />
             </div>
           )}
@@ -497,7 +497,7 @@ const Login = () => {
               type="email"
               onChange={(e) => setEmail(e.target.value)}
               value={email}
-              required
+              // required
             />
           </div>
 
@@ -508,7 +508,7 @@ const Login = () => {
               type="password"
               onChange={(e) => setPassword(e.target.value)}
               value={password}
-              required
+              // required
             />
           </div>
 

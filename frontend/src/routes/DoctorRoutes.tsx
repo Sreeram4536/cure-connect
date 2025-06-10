@@ -5,7 +5,8 @@ import React from "react";
 import DoctorLayout from "../layouts/DoctorLayout";
 
 // Doctor Pages
-import DoctorLogin from "../pages/admin/AdminLogin";
+import DoctorLogin from "../pages/doctor/DoctorLogin";
+import DoctorDashboard from "../pages/doctor/DoctorDashboard";
 
 const DoctorRoutes = () => {
   return (
@@ -13,8 +14,16 @@ const DoctorRoutes = () => {
       <Route
         path="/doctor/login"
         element={
-          <DoctorLayout>
+          
             <DoctorLogin />
+          
+        }
+      />
+      <Route
+        path="/doctor/dashboard"
+        element={
+          <DoctorLayout>
+            <DoctorDashboard />
           </DoctorLayout>
         }
       />

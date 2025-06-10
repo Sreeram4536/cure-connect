@@ -1,12 +1,23 @@
-import React,{ useState } from "react";
+import React, { useState, useEffect } from "react";
 import { assets } from "../../assets/assets";
 import { NavLink, useNavigate } from "react-router-dom";
 
-const Navbar = () => {
+const DoctorNavbar = () => {
   const navigate = useNavigate();
-
   const [showMenu, setShowMenu] = useState(false);
-  const [token, setToken] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
+
+  // Check token on component mount
+  useEffect(() => {
+    const storedToken = localStorage.getItem("dToken");
+    setToken(storedToken);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("dToken"); // Remove token from localStorage
+    setToken(null); // Clear token state
+    navigate("/doctor/login"); // Redirect to login page
+  };
 
   return (
     <div className="flex item-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400">
@@ -40,21 +51,21 @@ const Navbar = () => {
             <img className="w-8 rounded-full" src={assets.profile_pic} alt="" />
             <img className="w-2.5" src={assets.dropdown_icon} alt="" />
             <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
-              <div className="min-w-48 bg-stone-100 rounded flex flex-col gpa-4 p-4">
+              <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
                 <p
-                  onClick={() => navigate("/my-profile")}
+                  onClick={() => navigate("/doctor/my-profile")}
                   className="hover:text-black cursor-pointer"
                 >
                   My Profile
                 </p>
                 <p
-                  onClick={() => navigate("/my-appointments")}
+                  onClick={() => navigate("/doctor/my-appointments")}
                   className="hover:text-black cursor-pointer"
                 >
                   My Appointments
                 </p>
                 <p
-                  onClick={() => setToken(false)}
+                  onClick={handleLogout}
                   className="hover:text-black cursor-pointer"
                 >
                   Logout
@@ -64,10 +75,10 @@ const Navbar = () => {
           </div>
         ) : (
           <button
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/doctor/login")}
             className="bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block"
           >
-            Create account
+            Login
           </button>
         )}
         <img
@@ -111,4 +122,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default DoctorNavbar;

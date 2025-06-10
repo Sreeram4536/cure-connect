@@ -8,6 +8,19 @@ import { ErrorType } from "../../types/error";
 export class DoctorController implements IDoctorController {
   constructor(private doctorService: DoctorService) {}
 
+  async loginDoctor(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, password } = req.body;
+      const token = await this.doctorService.loginDoctor(email, password);
+      res.status(HttpStatus.OK).json({ success: true, token });
+    } catch (error) {
+        const err = error as Error;
+      res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ success: false, message: err.message });
+    }
+  }
+
   // For updating doctor availability
   async changeAvailability(req: Request, res: Response): Promise<void> {
     try {

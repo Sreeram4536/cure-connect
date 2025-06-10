@@ -51,6 +51,14 @@ const AdminDoctorList = () => {
                 />
                 <p>Available</p>
               </div>
+              {/* <button
+                onClick={() => changeBlockStatus(item._id, !item.isBlocked)}
+                className={`mt-2 px-4 py-2 rounded text-white ${
+                  item.isBlocked ? "bg-red-500" : "bg-green-500"
+                }`}
+              >
+                {item.isBlocked ? "Unblock" : "Block"}
+              </button> */}
             </div>
           </div>
         ))}

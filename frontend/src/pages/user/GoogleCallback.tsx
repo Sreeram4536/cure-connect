@@ -1,6 +1,7 @@
 import React,{ useEffect, useContext } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppContext } from "../../context/AppContext";
+import { toast } from "react-toastify";
 
 const GoogleCallback = () => {
   const [params] = useSearchParams();
@@ -15,6 +16,12 @@ const GoogleCallback = () => {
 
   useEffect(() => {
     const token = params.get("token");
+    const error = params.get("error");
+    if (error === "blocked") {
+        toast.error("Your account has been blocked. Please contact support.");
+        navigate("/login");
+        return;
+      }
     if (token) {
       localStorage.setItem("token", token);
       setToken(token);

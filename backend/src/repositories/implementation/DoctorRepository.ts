@@ -16,14 +16,14 @@ export class DoctorRepository implements IDoctorRepository {
     return await doctorModel.find({}).select("-password -email");
   }
 
-//   async findByEmail(email: string): Promise<DoctorData | null> {
-//     return await doctorModel.findOne({ email });
-//   }
+  async findByEmail(email: string): Promise<{ _id: string; email: string; password: string } | null> {
+    return await doctorModel.findOne({ email }).select("_id email password");
+  }
 
-//   async comparePassword(
-//     plainPassword: string,
-//     hashedPassword: string
-//   ): Promise<boolean> {
-//     return await bcrypt.compare(plainPassword, hashedPassword);
-//   }
+  async comparePassword(
+    plainPassword: string,
+    hashedPassword: string
+  ): Promise<boolean> {
+    return await bcrypt.compare(plainPassword, hashedPassword);
+  }
 }

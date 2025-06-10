@@ -1,5 +1,6 @@
 import { Route } from "react-router-dom";
 import React from "react";
+// import ProtectedRoute from "./ProtectedRoutes";
 
 // Layouts
 import UserLayout from "../layouts/UserLayout";
@@ -37,9 +38,11 @@ const UserRoutes = () => {
       <Route
         path="/doctors"
         element={
+            
           <UserLayout>
             <Doctors />
           </UserLayout>
+          
         }
       />
       <Route
