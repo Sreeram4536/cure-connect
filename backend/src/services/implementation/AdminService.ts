@@ -1,5 +1,6 @@
 import { IAdminRepository } from "../../repositories/interface/IAdminRepository";
 import { IAdminService } from "../interface/IAdminService";
+import { AppointmentDocument } from "../../types/appointment";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { v2 as cloudinary } from "cloudinary";
@@ -33,6 +34,7 @@ export class AdminService implements IAdminService {
       fees,
       address,
       imagePath,
+      isBlocked
     } = data;
 
     if (
@@ -82,6 +84,7 @@ export class AdminService implements IAdminService {
       fees,
       address,
       date: new Date(),
+      isBlocked
     };
 
     await this.adminRepository.saveDoctor(doctorData);
@@ -98,5 +101,22 @@ export class AdminService implements IAdminService {
 
   async toggleUserBlock(userId: string): Promise<string> {
     return await this.adminRepository.toggleUserBlock(userId);
+  }
+
+  async toggleDoctorBlock(doctorId: string, isBlocked: boolean): Promise<string> {
+    const doctor = await this.adminRepository.findDoctorById(doctorId);
+    if (!doctor) {
+      throw new Error("Doctor not found");
+    }
+  
+    await this.adminRepository.updateDoctorBlockStatus(doctorId, isBlocked);
+    return `Doctor ${isBlocked ? "blocked" : "unblocked"} successfully`;
+  }
+   async listAppointments(): Promise<AppointmentDocument[]> {
+    return await this.adminRepository.getAllAppointments();
+  }
+
+  async cancelAppointment(appointmentId: string): Promise<void> {
+    await this.adminRepository.cancelAppointment(appointmentId);
   }
 }

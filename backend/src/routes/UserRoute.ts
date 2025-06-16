@@ -37,10 +37,27 @@ userRouter.put(
   authUser,
   userController.updateProfile.bind(userController)
 );
+// userRouter.post(
+//   "/book-appointment",
+//   authUser,
+//   userController.bookAppointment.bind(userController)
+// );
+
 userRouter.post(
-  "/book-appointment",
+  "/appointments",
   authUser,
   userController.bookAppointment.bind(userController)
+);
+userRouter.get(
+  "/appointments",
+  authUser,
+  userController.listAppointment.bind(userController)
+);
+
+userRouter.patch(
+  "/appointments/:appointmentId/cancel",
+  authUser,
+  userController.cancelAppointment.bind(userController)
 );
 
 export default userRouter;

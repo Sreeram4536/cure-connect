@@ -13,7 +13,7 @@ export class UserController implements IUserController {
 
   // For registering new user
   async registerUser(req: Request, res: Response): Promise<void> {
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.body; 
 
     if (!name || !email || !password) {
       res
@@ -265,10 +265,81 @@ export class UserController implements IUserController {
   }
 
   // For Booking an appointment
-  async bookAppointment(req: Request, res: Response): Promise<void> {
+  // async bookAppointment(req: Request, res: Response): Promise<void> {
+  //   try {
+  //     await this.userService.bookAppointment(req.body);
+  //     res.json({ success: true, message: "Appointment booked" });
+  //   } catch (error) {
+  //     res
+  //       .status(HttpStatus.INTERNAL_SERVER_ERROR)
+  //       .json({ success: false, message: (error as Error).message });
+  //   }
+  // }
+
+   async bookAppointment(req: Request, res: Response): Promise<void> {
     try {
-      await this.userService.bookAppointment(req.body);
-      res.json({ success: true, message: "Appointment booked" });
+
+    const { docId, slotDate, slotTime } = req.body;
+    const userId = (req as any).userId;            
+
+    const user = await this.userService.getUserById(userId);
+    const doctor = await this.userService.getDoctorById(docId);
+
+    const appointmentData = {
+      userId,
+      docId,
+      slotDate,
+      slotTime,
+      userData: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+      },
+      docData: {
+        name: doctor.name,
+        speciality: doctor.speciality,
+      },
+      amount: doctor.fees,
+      date: Date.now(),
+    };
+
+      await this.userService.bookAppointment(appointmentData);
+      res.status(HttpStatus.OK).json({ success: true, message: "Appointment booked" });
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  // To list all the appointments
+  async listAppointment(req: Request, res: Response): Promise<void> {
+
+    try {
+
+      const  userId  = (req as any).userId;
+      const appointments = await this.userService.listUserAppointments(userId)
+
+      res.status(HttpStatus.OK).json({success: true, appointments})
+      
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ success: false, message: (error as Error).message });
+    }
+  }
+
+// For cancelling the appointment
+  async cancelAppointment(req: Request, res: Response): Promise<void> {
+
+    try {
+
+    const userId = (req as any).userId;          
+    const { appointmentId } = req.body;                  
+
+    await this.userService.cancelAppointment(userId, appointmentId);
+    res.status(HttpStatus.OK).json({ success: true, message: "Appointment cancelled" });
+      
     } catch (error) {
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)

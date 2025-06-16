@@ -53,3 +53,37 @@ export const toggleUserBlockAPI = async (userId: string, block: boolean, token: 
     }
   );
 };
+
+export const toggleDoctorBlockAPI = async (doctorId: string, isBlocked: boolean, token: string) => {
+  return await api.patch("/api/admin/doctor/block", { doctorId, isBlocked }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// To get all the appointments
+export const getAllAppointmentsAPI = async (token: string) => {
+  return await api.get("/api/admin/appointments", {
+    headers: { aToken: token },
+  });
+};
+
+// To cancel the appointments
+export const adminCancelAppointmentAPI = async (
+  appointmentId: string,
+  token: string
+) => {
+  return await api.patch(
+    `/api/admin/appointments/${appointmentId}/cancel`,
+    {},
+    {
+      headers: { aToken: token },
+    }
+  );
+};
+
+// To get the dashboard data
+export const adminDashboardAPI = async (token: string) => {
+  return await api.get("/api/admin/dashboard", {
+    headers: { aToken: token },
+  });
+};

@@ -18,6 +18,8 @@ import EmailVerificationPage from "../pages/user/EmailVerify";
 import OtpVerificationPage from "../pages/user/OTPVerification";
 import NewPasswordPage from "../pages/user/SetNewPassword";
 import GoogleCallback from "../pages/user/GoogleCallback";
+// import Consultation from "../pages/user/Consultation";
+
 
 const UserRoutes = () => {
   return (
@@ -93,6 +95,15 @@ const UserRoutes = () => {
           </UserLayout>
         }
       />
+      {/* <Route
+        path="/consultation/:doctorId"
+        element={
+          <UserLayout>
+            <Consultation />
+          </UserLayout>
+        }
+      />
+      <Route path="/chats/:doctorId" element={<ChatPage />} /> */}
     </>
   );
 };

@@ -4,6 +4,7 @@ import { IAdminController } from "../interface/adminController.interface";
 import { CustomRequest } from "../../types/customRequest";
 import { HttpStatus } from "../../constants/status.constants";
 import { DoctorDTO } from "../../types/doctors";
+import { HttpResponse } from "../../constants/responseMessage.constants";
 
 export class AdminController implements IAdminController {
   constructor(private adminService: IAdminService) {}
@@ -57,6 +58,7 @@ export class AdminController implements IAdminController {
         fees: Number(fees),
         address: JSON.parse(address),
         imagePath: imageFile?.path,
+        isBlocked: false,
       };
       const message = await this.adminService.addDoctor(doctorDTO);
       res.status(HttpStatus.CREATED).json({ success: true, message });
@@ -109,6 +111,66 @@ export class AdminController implements IAdminController {
       res
         .status(HttpStatus.BAD_REQUEST)
         .json({ success: false, message: error.message });
+    }
+  }
+
+  async toggleDoctorBlock(req: Request, res: Response): Promise<void> {
+    try {
+      const { doctorId, isBlocked } = req.body;
+      const message = await this.adminService.toggleDoctorBlock(doctorId, isBlocked);
+      res.status(200).json({ success: true, message });
+    } catch (error) {
+      const err = error as Error;
+      res.status(500).json({ success: false, message: err.message });
+    }
+  }
+
+   async appointmentsList(req: Request, res: Response): Promise<void> {
+    try {
+      const appointments = await this.adminService.listAppointments();
+      res.status(HttpStatus.OK).json({ success: true, appointments });
+    } catch (error) {
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  // For appointment cancelation
+  async adminCancelAppointment(req: Request, res: Response): Promise<void> {
+    try {
+      const { appointmentId } = req.params;
+
+      await this.adminService.cancelAppointment(appointmentId);
+      res
+        .status(HttpStatus.OK)
+        .json({ success: true, message: HttpResponse.APPOINTMENT_CANCELLED });
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  // For admin dashboard
+  async adminDashboard(req: Request, res: Response): Promise<void> {
+    try {
+      const doctors = await this.adminService.getDoctors();
+      const users = await this.adminService.getUsers();
+      const appointments = await this.adminService.listAppointments();
+
+      const dashData = {
+        doctors: doctors.length,
+        patients: users.length,
+        appointments: appointments.length,
+        latestAppointments: appointments.reverse().slice(0, 5),
+      };
+
+      res.status(HttpStatus.OK).json({ success: true, dashData });
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ success: false, message: (error as Error).message });
     }
   }
 }

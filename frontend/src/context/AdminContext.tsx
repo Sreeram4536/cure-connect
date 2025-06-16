@@ -8,8 +8,16 @@ import {
   getAllDoctorsAPI,
   getAllUsersAPI,
   toggleUserBlockAPI,
+  toggleDoctorBlockAPI,
+  getAllAppointmentsAPI,
+  adminCancelAppointmentAPI,
+  adminDashboardAPI
 } from "../services/adminServices";
 import { showErrorToast } from "../utils/errorHandler";
+import type { AppointmentTypes } from "../types/appointment";
+import axios from "axios";
+
+
 
 interface AdminContextType {
   aToken: string;
@@ -21,6 +29,13 @@ interface AdminContextType {
   users: userData[];
   getAllUsers: () => Promise<void>;
   toggleBlockUser: (userId: string) => Promise<void>;
+  toggleDoctorBlock: (doctorId: string) => Promise<void>; 
+  appointments: AppointmentTypes[];
+  setAppointments: React.Dispatch<React.SetStateAction<AppointmentTypes[]>>;
+  getAllAppointments: () => Promise<void>;
+  cancelAppointment: (appointmentId: string) => Promise<void>;
+  dashData: any;
+  getDashData: () => Promise<void>;
 }
 
 export const AdminContext = createContext<AdminContextType | null>(null);
@@ -33,6 +48,8 @@ const AdminContextProvider = ({ children }: AdminContextProviderProps) => {
   const [aToken, setAToken] = useState(localStorage.getItem("aToken") ?? "");
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [users, setUsers] = useState<userData[]>([]);
+   const [appointments, setAppointments] = useState<AppointmentTypes[]>([]);
+  const [dashData, setDashData] = useState(false);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -109,6 +126,71 @@ const AdminContextProvider = ({ children }: AdminContextProviderProps) => {
     }
   };
 
+   const getAllAppointments = async () => {
+    try {
+      const { data } = await getAllAppointmentsAPI(aToken);
+
+      if (data.success) {
+        setAppointments(data.appointments.reverse());
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
+
+  const cancelAppointment = async (appointmentId: string) => {
+    try {
+      const { data } = await adminCancelAppointmentAPI(appointmentId, aToken);
+
+      if (data.success) {
+        toast.success(data.message);
+        getAllAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
+
+  const getDashData = async () => {
+    try {
+      const { data } = await adminDashboardAPI(aToken);
+
+      if (data.success) {
+        setDashData(data.dashData);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
+
+  const toggleDoctorBlock = async (doctorId: string) => {
+    try {
+      const doctor = doctors.find((doc) => doc._id === doctorId);
+      if (!doctor) {
+        toast.error("Doctor not found");
+        return;
+      }
+  
+      const newBlockStatus = !doctor.isBlocked;
+  
+      const { data } = await toggleDoctorBlockAPI(doctorId, newBlockStatus, aToken);
+      if (data.success) {
+        toast.success(data.message);
+        getAllDoctors(); // Refresh the doctor list
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
+
   const value: AdminContextType = {
     aToken,
     setAToken,
@@ -119,6 +201,13 @@ const AdminContextProvider = ({ children }: AdminContextProviderProps) => {
     users,
     getAllUsers,
     toggleBlockUser,
+    toggleDoctorBlock,
+    appointments,
+    setAppointments,
+    getAllAppointments,
+    cancelAppointment,
+    dashData,
+    getDashData,
   };
 
   return (

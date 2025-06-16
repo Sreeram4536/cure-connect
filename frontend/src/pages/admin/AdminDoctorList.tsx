@@ -10,7 +10,7 @@ const AdminDoctorList = () => {
     throw new Error("AdminContext must be used within AdminContextProvider");
   }
 
-  const { doctors, aToken, getAllDoctors, changeAvailability } = context;
+  const { doctors, aToken, getAllDoctors, changeAvailability,toggleDoctorBlock } = context;
 
   useEffect(() => {
     if (aToken) {
@@ -51,14 +51,14 @@ const AdminDoctorList = () => {
                 />
                 <p>Available</p>
               </div>
-              {/* <button
-                onClick={() => changeBlockStatus(item._id, !item.isBlocked)}
+              <button
+                onClick={() => toggleDoctorBlock(item._id)}
                 className={`mt-2 px-4 py-2 rounded text-white ${
                   item.isBlocked ? "bg-red-500" : "bg-green-500"
                 }`}
               >
                 {item.isBlocked ? "Unblock" : "Block"}
-              </button> */}
+              </button>
             </div>
           </div>
         ))}

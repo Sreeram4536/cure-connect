@@ -1,74 +1,123 @@
 import {
-    userDataRepository,
-    UserDocument,
-  } from "../../repositories/interface/IUserRepository";
+  userDataRepository,
+  
+} from "../../repositories/interface/IUserRepository";
 //   import userModel from "../../models/userModel";
-  import userModel from "../../models/userModels";
-  import { userData } from "../../types/user";
-  import doctorModel from "../../models/doctorModel";
-  import { AppointmentTypes } from "../../types/appointment";
-  import appointmentModel from "../../models/appointmentModel";
-  
-  export class UserRepository implements userDataRepository {
-    async create(user: Partial<userData>): Promise<UserDocument> {
-      return (await new userModel(user).save()) as UserDocument;
+import userModel from "../../models/userModels";
+import { userData } from "../../types/user";
+import { DoctorData } from "../../types/doctors";
+import doctorModel from "../../models/doctorModel";
+import { AppointmentTypes,AppointmentDocument } from "../../types/appointment";
+import appointmentModel from "../../models/appointmentModel";
+import { UserDocument } from "../../types/user";
+import { BaseRepository } from "../BaseRepository";
+
+export class UserRepository extends BaseRepository<UserDocument> implements userDataRepository {
+   constructor() {
+    super(userModel);
+  }
+
+  async create(user: Partial<userData>): Promise<UserDocument> {
+    return (await new userModel(user).save()) as UserDocument;
+  }
+
+  async findByEmail(email: string): Promise<UserDocument | null> {
+    return this.findOne({ email });
+  }
+
+  async findById(id: string): Promise<UserDocument | null> {
+    return (await userModel
+      .findById(id)
+      .select("-password")) as UserDocument | null;
+  }
+
+  async updateById(id: string, data: Partial<userData>): Promise<void> {
+    await userModel.findByIdAndUpdate(id, data);
+  }
+
+  async updatePasswordByEmail(
+    email: string,
+    newHashedPassword: string
+  ): Promise<boolean> {
+    const updatedUser = await userModel.findOneAndUpdate(
+      { email },
+      { $set: { password: newHashedPassword } }
+    );
+    return !!updatedUser;
+  }
+
+  async bookAppointment(appointmentData: AppointmentTypes): Promise<void> {
+    const { userId, docId, slotDate, slotTime } = appointmentData;
+
+    const doctor = await doctorModel.findById(docId);
+    if (!doctor || !doctor.available) throw new Error("Doctor not available");
+
+    const slots = (doctor.slots_booked || {}) as Record<string, string[]>;
+
+    if (slots[slotDate]?.includes(slotTime)) {
+      throw new Error("Slot not available");
     }
-  
-    async findByEmail(email: string): Promise<UserDocument | null> {
-      return (await userModel.findOne({ email })) as UserDocument | null;
+
+    if (!slots[slotDate]) slots[slotDate] = [];
+    slots[slotDate].push(slotTime);
+
+    const userData = await userModel.findById(userId).select("-password");
+    const docData = await doctorModel.findById(docId).select("-password");
+
+    const appointment = new appointmentModel({
+      userId,
+      docId,
+      userData,
+      docData,
+      amount: docData!.fees,
+      slotTime,
+      slotDate,
+      date: new Date(),
+    });
+
+    await appointment.save();
+    await doctorModel.findByIdAndUpdate(docId, { slots_booked: slots });
+  }
+
+  async findDoctorById(id: string): Promise<DoctorData | null> {
+    return (await doctorModel
+      .findById(id)
+      .select("-password")) as DoctorData | null;
+  }
+
+  async getAppointmentsByUserId(userId: string): Promise<AppointmentTypes[]> {
+    return await appointmentModel.find({ userId }).sort({ date: -1 });
+  }
+
+  async cancelAppointment(
+    userId: string,
+    appointmentId: string
+  ): Promise<void> {
+    const appointment = await appointmentModel.findById(appointmentId);
+    if (!appointment) throw new Error("Appointment not found");
+
+    if (appointment.userId.toString() !== userId) {
+      throw new Error("Unauthorized action");
     }
-  
-    async findById(id: string): Promise<UserDocument | null> {
-      return (await userModel
-        .findById(id)
-        .select("-password")) as UserDocument | null;
+
+    if (appointment.cancelled) {
+      throw new Error("Appointment already cancelled");
     }
-  
-    async updateById(id: string, data: Partial<userData>): Promise<void> {
-      await userModel.findByIdAndUpdate(id, data);
-    }
-  
-    async updatePasswordByEmail(
-      email: string,
-      newHashedPassword: string
-    ): Promise<boolean> {
-      const updatedUser = await userModel.findOneAndUpdate(
-        { email },
-        { $set: { password: newHashedPassword } }
-      );
-      return !!updatedUser;
-    }
-  
-    async bookAppointment(appointmentData: AppointmentTypes): Promise<void> {
-      const { userId, docId, slotDate, slotTime } = appointmentData;
-  
-      const doctor = await doctorModel.findById(docId);
-      if (!doctor || !doctor.available) throw new Error("Doctor not available");
-  
-      const slots = (doctor.slots_booked || {}) as Record<string, string[]>;
-  
-      if (slots[slotDate]?.includes(slotTime)) {
-        throw new Error("Slot not available");
+
+    appointment.cancelled = true;
+    await appointment.save();
+
+    const { docId, slotDate, slotTime } = appointment;
+    const doctor = await doctorModel.findById(docId);
+    if (doctor) {
+      const slots = doctor.slots_booked || {};
+      if (Array.isArray(slots[slotDate])) {
+        slots[slotDate] = slots[slotDate].filter((t: string) => t !== slotTime);
+        if (!slots[slotDate].length) delete slots[slotDate];
+        doctor.slots_booked = slots;
+        doctor.markModified("slots_booked");
+        await doctor.save();
       }
-  
-      if (!slots[slotDate]) slots[slotDate] = [];
-      slots[slotDate].push(slotTime);
-  
-      const userData = await userModel.findById(userId).select("-password");
-      const docData = await doctorModel.findById(docId).select("-password");
-  
-      const appointment = new appointmentModel({
-        userId,
-        docId,
-        userData,
-        docData,
-        amount: docData!.fees,
-        slotTime,
-        slotDate,
-        date: new Date(),
-      });
-  
-      await appointment.save();
-      await doctorModel.findByIdAndUpdate(docId, { slots_booked: slots });
     }
   }
+}

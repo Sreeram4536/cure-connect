@@ -1,7 +1,9 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { DoctorData } from "../types/doctors";
 
-interface DoctorDocument extends DoctorData, Document {}
+interface DoctorDocument extends DoctorData, Document {
+  _id: string;
+}
 
 const doctorSchema: Schema<DoctorDocument> = new mongoose.Schema(
   {
@@ -70,6 +72,11 @@ const doctorSchema: Schema<DoctorDocument> = new mongoose.Schema(
       type: Object,
       default: {},
     },
+    
+    isBlocked:{
+        type:Boolean,
+        default:false
+    }
   },
   { minimize: false }
 );

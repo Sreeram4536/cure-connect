@@ -52,4 +52,27 @@ adminRouter.patch(
   doctorController.changeAvailability.bind(doctorController)
 );
 
+// adminRouter.patch("/doctors/:id/approve", authAdmin, adminController.approveDoctor.bind(adminController));
+// adminRouter.patch("/doctors/:id/reject", authAdmin, adminController.rejectDoctor.bind(adminController));
+
+
+adminRouter.patch("/doctor/block", adminController.toggleDoctorBlock.bind(adminController));
+adminRouter.get(
+  "/appointments",
+  authAdmin,
+  adminController.appointmentsList.bind(adminController)
+);
+
+adminRouter.patch(
+  "/appointments/:appointmentId/cancel",
+  authAdmin,
+  adminController.adminCancelAppointment.bind(adminController)
+);
+
+adminRouter.get(
+  "/dashboard",
+  authAdmin,
+  adminController.adminDashboard.bind(adminController)
+);
+
 export default adminRouter;

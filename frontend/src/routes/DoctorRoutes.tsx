@@ -7,6 +7,8 @@ import DoctorLayout from "../layouts/DoctorLayout";
 // Doctor Pages
 import DoctorLogin from "../pages/doctor/DoctorLogin";
 import DoctorDashboard from "../pages/doctor/DoctorDashboard";
+import DoctorAppointments from "../pages/doctor/DoctorAppointments";
+import DoctorProfile from "../pages/doctor/DoctorProfile";
 
 const DoctorRoutes = () => {
   return (
@@ -24,6 +26,22 @@ const DoctorRoutes = () => {
         element={
           <DoctorLayout>
             <DoctorDashboard />
+          </DoctorLayout>
+        }
+      />
+       <Route
+        path="/doctor/appointments"
+        element={
+          <DoctorLayout>
+            <DoctorAppointments />
+          </DoctorLayout>
+        }
+      />
+      <Route
+        path="/doctor/profile"
+        element={
+          <DoctorLayout>
+            <DoctorProfile />
           </DoctorLayout>
         }
       />

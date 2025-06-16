@@ -1,6 +1,7 @@
 import { userDataService } from "../interface/IUserService";
 import { userDataRepository } from "../../repositories/interface/IUserRepository";
 import { userData } from "../../types/user";
+import { DoctorData } from "../../types/doctors";
 import bcrypt from "bcrypt";
 import Jwt from "jsonwebtoken";
 import validator from "validator";
@@ -112,7 +113,32 @@ export class UserService implements userDataService {
     );
   }
 
+   async getUserById(id: string): Promise<UserDocument> {
+    const user = await this.userRepository.findById(id);
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  async getDoctorById(id: string): Promise<DoctorData> {
+    const doctor = (await this.userRepository.findDoctorById(
+      id
+    )) as DoctorData | null;
+    if (!doctor) throw new Error("Doctor not found");
+    return doctor;
+  }
+
   async bookAppointment(appointmentData: AppointmentTypes): Promise<void> {
     await this.userRepository.bookAppointment(appointmentData);
+  }
+
+  async listUserAppointments(userId: string): Promise<AppointmentTypes[]> {
+    return await this.userRepository.getAppointmentsByUserId(userId);
+  }
+
+  async cancelAppointment(
+    userId: string,
+    appointmentId: string
+  ): Promise<void> {
+    await this.userRepository.cancelAppointment(userId, appointmentId);
   }
 }

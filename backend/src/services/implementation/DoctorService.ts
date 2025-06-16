@@ -1,6 +1,9 @@
 import { IDoctorRepository } from "../../repositories/interface/IDoctorRepository";
 import { IDoctorService } from "../interface/IDoctorService";
 import  jwt  from "jsonwebtoken";
+import { DoctorData } from "../../types/doctors";
+import doctorModel from "../../models/doctorModel";
+import { AppointmentTypes } from "../../types/appointment";
 
 export class DoctorService implements IDoctorService {
   constructor(private doctorRepository: IDoctorRepository) {}
@@ -39,5 +42,51 @@ export class DoctorService implements IDoctorService {
 
   async getAllDoctors(): Promise<any[]> {
     return await this.doctorRepository.findAllDoctors();
+  }
+
+  async blockDoctor(doctorId: string, isBlocked: boolean): Promise<void> {
+    const doctor = await this.doctorRepository.findById(doctorId);
+    if (!doctor) {
+      throw new Error("Doctor not found");
+    }
+    await this.doctorRepository.updateBlockStatus(doctorId, isBlocked);
+  }
+
+  async findDoctorByEmail(email: string): Promise<DoctorData | null> {
+    return await doctorModel.findOne({ email }).select(
+      "_id name email password speciality degree experience about available fees address date slots_booked isBlocked"
+    );
+  }
+
+   async getDoctorAppointments(docId: string): Promise<AppointmentTypes[]> {
+    const doctor = await this.doctorRepository.findById(docId);
+    if (!doctor) {
+      throw new Error("Doctor not found");
+    }
+
+    return await this.doctorRepository.findAppointmentsByDoctorId(docId);
+  }
+
+  async confirmAppointment(
+    docId: string,
+    appointmentId: string
+  ): Promise<void> {
+    const appointment = await this.doctorRepository.findAppointmentById(
+      appointmentId
+    );
+    if (!appointment || appointment.docId !== docId) {
+      throw new Error("Mark Failed");
+    }
+    await this.doctorRepository.markAppointmentAsConfirmed(appointmentId);
+  }
+
+  async cancelAppointment(docId: string, appointmentId: string): Promise<void> {
+    const appointment = await this.doctorRepository.findAppointmentById(
+      appointmentId
+    );
+    if (!appointment || appointment.docId !== docId) {
+      throw new Error("Cancellation Failed");
+    }
+    await this.doctorRepository.cancelAppointment(appointmentId);
   }
 }
