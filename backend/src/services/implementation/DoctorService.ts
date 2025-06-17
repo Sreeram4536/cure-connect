@@ -59,6 +59,7 @@ export class DoctorService implements IDoctorService {
   }
 
    async getDoctorAppointments(docId: string): Promise<AppointmentTypes[]> {
+    console.log("Looking for doctor with _id:", docId, typeof docId);
     const doctor = await this.doctorRepository.findById(docId);
     if (!doctor) {
       throw new Error("Doctor not found");

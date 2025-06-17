@@ -6,6 +6,29 @@ export const api = axios.create({
   withCredentials: true,
 });
 
+// Add this interceptor to include JWT token in every request
+api.interceptors.request.use(
+  (config) => {
+    // const token = localStorage.getItem("token");
+     let token ;
+    const path = window.location.pathname;
+
+    if (path.startsWith("/doctor")) {
+      token = localStorage.getItem("dToken");
+    } else if (path.startsWith("/admin")) {
+      token = localStorage.getItem("aToken");
+    } else {
+      token = localStorage.getItem("token");
+    }
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Global response interceptor for blocked users
 api.interceptors.response.use(
   (response) => response,

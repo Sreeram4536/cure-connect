@@ -1,12 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import { showErrorToast } from "../../utils/errorHandler";
+import { api } from "../../axios/axiosInstance";
 import {
   cancelAppointmentAPI,
   getAppointmentsAPI,
 } from "../../services/appointmentServices";
 import { toast } from "react-toastify";
 import type { AppointmentTypes } from "../../types/appointment";
+import StripeModal from "../../components/Payment/PaymentModal";
 // import {
 //   PaymentRazorpayAPI,
 //   VerifyRazorpayAPI,
@@ -27,6 +29,10 @@ const MyAppointments = () => {
   const { token, getDoctorsData, slotDateFormat } = context;
 
   const [appointments, setAppointments] = useState<AppointmentTypes[]>([]);
+
+   const [stripeOpen, setStripeOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+
 
   const navigate = useNavigate();
 
@@ -62,6 +68,31 @@ const MyAppointments = () => {
       showErrorToast(error);
     }
   };
+
+   const handlePayOnline = (appointment: any) => {
+    setSelectedAppointment(appointment);
+    setStripeOpen(true);
+  };
+
+  const handleStripeSuccess = async () => {
+  if (!selectedAppointment) return;
+  try {
+    await api.post("/api/user/mark-appointment-paid", {
+      appointmentId: selectedAppointment._id,
+    });
+    toast.success("Payment successful!");
+    getUserAppointments(); // Refresh the list
+  } catch (error) {
+    toast.error("Failed to update payment status!");
+  }
+  setStripeOpen(false);
+};
+
+  // const handleStripeSuccess = () => {
+  //   toast.success("Payment successful!");
+  //   // Refresh appointments list here (call your fetch function)
+  //   setStripeOpen(false);
+  // };
 
   // const initPay = (
   //   order: { id: string; amount: number; currency: string; receipt?: string },
@@ -170,7 +201,7 @@ const MyAppointments = () => {
 
               {!item.cancelled && !item.payment && (
                 <button
-                  onClick={() => appointmentRazorpay(item._id!)}
+                  onClick={() => handlePayOnline(item)}
                   className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounde hover:bg-primary hover:text-white transition-all duration-300"
                 >
                   Pay Online
@@ -194,6 +225,12 @@ const MyAppointments = () => {
             </div>
           </div>
         ))}
+        <StripeModal
+        open={stripeOpen}
+        amount={selectedAppointment ? selectedAppointment.amount * 100 : 0}
+        onSuccess={handleStripeSuccess}
+        onClose={() => setStripeOpen(false)}
+      />
       </div>
     </div>
   );

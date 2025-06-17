@@ -60,4 +60,7 @@ userRouter.patch(
   userController.cancelAppointment.bind(userController)
 );
 
+userRouter.post("/create-stripe-payment-intent",authUser, userController.createStripePaymentIntent.bind(userController));
+userRouter.post("/mark-appointment-paid",authUser, userController.markAppointmentPaid.bind(userController));
+
 export default userRouter;

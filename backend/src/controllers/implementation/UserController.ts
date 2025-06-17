@@ -7,6 +7,10 @@ import { otpStore } from "../../utils/otpStore";
 import { sendOTP } from "../../utils/mail.util";
 import { generateOTP } from "../../utils/otp.util";
 import { isValidName,isValidEmail,isValidPassword } from "../../utils/validator";
+import appointmentModel from "../../models/appointmentModel";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export class UserController implements IUserController {
   constructor(private userService: userDataService) {}
@@ -346,4 +350,28 @@ export class UserController implements IUserController {
         .json({ success: false, message: (error as Error).message });
     }
   }
+
+  async createStripePaymentIntent(req: Request, res: Response): Promise<void> {
+    try {
+      const { amount } = req.body; // amount in paise (₹100 = 10000)
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency: "inr",
+      });
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      console.error("Stripe PaymentIntent Error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async markAppointmentPaid(req: Request, res: Response): Promise<void> {
+  try {
+    const { appointmentId } = req.body;
+    await appointmentModel.findByIdAndUpdate(appointmentId, { payment: true });
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
 }

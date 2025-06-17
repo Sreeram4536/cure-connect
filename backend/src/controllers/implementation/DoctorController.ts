@@ -111,7 +111,7 @@ export class DoctorController implements IDoctorController {
   async appointmentsDoctor(req: Request, res: Response): Promise<void> {
     try {
       const docId = (req as any).docId;
-
+      console.log("Doctor ID from token:", docId);
       const appointments = await this.doctorService.getDoctorAppointments(docId);
 
       res.status(HttpStatus.OK).json({ success: true, appointments });
@@ -158,5 +158,6 @@ export class DoctorController implements IDoctorController {
     }
   }
 
+  
 
 }

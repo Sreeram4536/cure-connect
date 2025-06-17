@@ -9,6 +9,7 @@ import DoctorLogin from "../pages/doctor/DoctorLogin";
 import DoctorDashboard from "../pages/doctor/DoctorDashboard";
 import DoctorAppointments from "../pages/doctor/DoctorAppointments";
 import DoctorProfile from "../pages/doctor/DoctorProfile";
+import DoctorSlots from "../pages/doctor/DoctorSlots";
 
 const DoctorRoutes = () => {
   return (
@@ -34,6 +35,14 @@ const DoctorRoutes = () => {
         element={
           <DoctorLayout>
             <DoctorAppointments />
+          </DoctorLayout>
+        }
+      />
+       <Route
+        path="/doctor/slots"
+        element={
+          <DoctorLayout>
+            <DoctorSlots />
           </DoctorLayout>
         }
       />
