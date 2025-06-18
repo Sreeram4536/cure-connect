@@ -12,4 +12,5 @@ export interface IDoctorRepository {
   findAppointmentById(id: string): Promise<AppointmentTypes | null>;
   markAppointmentAsConfirmed(id: string): Promise<void>;
   cancelAppointment(id: string): Promise<void>
+  updateById(docId: string, data: Partial<DoctorData>): Promise<void>;
 }

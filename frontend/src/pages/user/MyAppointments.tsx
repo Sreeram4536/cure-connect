@@ -56,6 +56,8 @@ const MyAppointments = () => {
   const cancelAppointment = async (appointmentId: string) => {
     try {
       const { data } = await cancelAppointmentAPI(appointmentId, token);
+      console.log("appointment id is",appointmentId);
+      
 
       if (data.success) {
         toast.success(data.message);

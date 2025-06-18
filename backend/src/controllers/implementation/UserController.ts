@@ -339,7 +339,10 @@ export class UserController implements IUserController {
     try {
 
     const userId = (req as any).userId;          
-    const { appointmentId } = req.body;                  
+    const  appointmentId  = req.params.id;   
+    console.log("ids are",userId,appointmentId);
+     console.log("params are",req.params);
+                   
 
     await this.userService.cancelAppointment(userId, appointmentId);
     res.status(HttpStatus.OK).json({ success: true, message: "Appointment cancelled" });

@@ -102,4 +102,21 @@ export class DoctorRepository extends BaseRepository<DoctorDocument> implements 
   async updateBlockStatus(doctorId: string, isBlocked: boolean): Promise<void> {
     await doctorModel.findByIdAndUpdate(doctorId, { isBlocked }); // Update block status
   }
+
+  // async updateById(id: string, data: Partial<DoctorData>): Promise<DoctorData> {
+  //   const updatedDoctor = await doctorModel.findByIdAndUpdate(
+  //     id,
+  //     { $set: data },
+  //     { new: true }
+  //   ).select("-password");
+    
+  //   if (!updatedDoctor) {
+  //     throw new Error("Doctor not found");
+  //   }
+    
+  //   return updatedDoctor;
+  // }
+  async updateById(id: string, data: Partial<DoctorData>): Promise<void> {
+    await doctorModel.findByIdAndUpdate(id, data);
+  }
 }

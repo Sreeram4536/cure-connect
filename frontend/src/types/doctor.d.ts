@@ -3,8 +3,12 @@ import { Address } from "./user";
 export interface Doctor {
     _id: string;
     name: string;
-    image: string;
+    image?: string;
+    email: string; // <-- Add this line
+  phone: string;
     speciality: string;
+    specialization: string;
+    qualification: string;
     degree: string;
     experience: string;
     available?: boolean;

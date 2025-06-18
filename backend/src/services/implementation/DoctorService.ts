@@ -4,6 +4,7 @@ import  jwt  from "jsonwebtoken";
 import { DoctorData } from "../../types/doctors";
 import doctorModel from "../../models/doctorModel";
 import { AppointmentTypes } from "../../types/appointment";
+import { v2 as cloudinary } from "cloudinary";
 
 export class DoctorService implements IDoctorService {
   constructor(private doctorRepository: IDoctorRepository) {}
@@ -89,5 +90,42 @@ export class DoctorService implements IDoctorService {
       throw new Error("Cancellation Failed");
     }
     await this.doctorRepository.cancelAppointment(appointmentId);
+  }
+
+   async getDoctorById(docId: string): Promise<DoctorData | null> {
+    const doctor = await this.doctorRepository.findById(docId);
+    if (!doctor) {
+      throw new Error("Doctor not found");
+    }
+    return doctor;
+  }
+
+  async updateDoctorProfile(
+    docId: string,
+    data: Partial<DoctorData>,
+    imageFile?: Express.Multer.File
+  ): Promise<void> {
+    if (!data.name || !data.address) {
+      throw new Error("Please provide all required details");
+    }
+
+    // if (!isValidPhone(data.phone)) {
+    //   throw new Error("Phone number must be 10 digits");
+    // }
+
+    if (imageFile) {
+      const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+        resource_type: "image",
+      });
+      data.image = imageUpload.secure_url;
+    }
+
+    // const updatedDoctor = await this.doctorRepository.updateById(docId, data);
+    // if (!updatedDoctor) {
+    //   throw new Error("Failed to update profile");
+    // }
+
+    // return updatedDoctor;
+    await this.doctorRepository.updateById(docId, data);
   }
 }

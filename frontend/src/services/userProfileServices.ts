@@ -35,4 +35,5 @@ export const updateUserProfileAPI = async (
   } catch (error) {
     showErrorToast(error);
   }
+  
 };

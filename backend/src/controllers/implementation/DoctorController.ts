@@ -6,6 +6,7 @@ import { HttpStatus } from "../../constants/status.constants";
 import { ErrorType } from "../../types/error"
 import { isValidEmail,isValidPassword } from "../../utils/validator";
 import { HttpResponse } from "../../constants/responseMessage.constants";
+import doctorModel from "../../models/doctorModel";
 
 
 export class DoctorController implements IDoctorController {
@@ -158,6 +159,101 @@ export class DoctorController implements IDoctorController {
     }
   }
 
-  
+  //  async getProfile(req: Request, res: Response) {
+  //   try {
+  //     const docId = (req as any).docId;
+  //     const doctor = await doctorModel.findById(docId);
+  //     if (!doctor) return res.status(404).json({ success: false, message: "Doctor not found" });
+  //     res.json({ success: true, doctor });
+  //   } catch (error) {
+  //     res.status(500).json({ success: false, message: (error as Error).message });
+  //   }
+  // }
+
+  //  async updateProfile(req: Request, res: Response) {
+  //   try {
+  //     const docId = (req as any).docId;
+  //     const {
+  //       name,
+  //       email,
+  //       speciality,
+  //       degree,
+  //       experience,
+  //       about,
+  //       fees,
+  //       address,
+  //     } = req.body;
+
+  //     // Handle image upload if needed
+  //     let updateData: any = {
+  //       name,
+  //       email,
+  //       speciality,
+  //       degree,
+  //       experience,
+  //       about,
+  //       fees,
+  //       address,
+  //     };
+
+  //     if (req.file) {
+  //       // Save image and set image path/url
+  //       updateData.image = req.file.filename; // or your image URL logic
+  //     }
+
+  //     const doctor = await doctorModel.findByIdAndUpdate(docId, updateData, { new: true });
+  //     if (!doctor) return res.status(404).json({ success: false, message: "Doctor not found" });
+  //     res.json({ success: true, doctor, message: "Profile updated successfully" });
+  //   } catch (error) {
+  //     res.status(500).json({ success: false, message: (error as Error).message });
+  //   }
+  // }
+
+  async getProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const docId = (req as any).docId;
+      const doctor = await this.doctorService.getDoctorById(docId);
+      if (!doctor) {
+        res.status(HttpStatus.NOT_FOUND).json({ success: false, message: "Doctor not found" });
+        return;
+      }
+      if (doctor.isBlocked) {
+        res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "blocked" });
+        return;
+      }
+      res.status(HttpStatus.OK).json({ success: true, doctor });
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async updateProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const docId = (req as any).docId;
+      const updateData = req.body;
+      
+      // Validate required fields based on your model
+      if (!updateData.name || !updateData.email || !updateData.speciality || 
+          !updateData.degree || !updateData.experience || !updateData.fees || 
+          !updateData.about || !updateData.address) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          success: false,
+          message: "Please provide all required details"
+        });
+        return;
+      }
+
+      await this.doctorService.updateDoctorProfile(docId, updateData, req.file);
+      res.status(HttpStatus.OK).json({ success: true, message: "Profile updated successfully" });
+    } catch (error) {
+      const err = error as Error;
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: err.message
+      });
+    }
+  }
 
 }
