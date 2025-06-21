@@ -4,11 +4,13 @@ import AdminSidebar from "../components/admin/AdminSidebar";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="mx-4 sm:mx=[10%]">
+    <div className="min-h-screen w-full bg-gray-50">
       <Navbar />
       <div className="flex">
-        <AdminSidebar />
-        <div className="flex-1">{children}</div>
+        <div className="w-64 min-h-screen bg-white shadow-md">
+          <AdminSidebar />
+        </div>
+        <div className="flex-1 p-6">{children}</div>
       </div>
     </div>
   );

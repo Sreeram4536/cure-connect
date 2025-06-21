@@ -3,11 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { doctorLoginAPI } from "../../services/doctorServices";
 import { assets } from "../../assets/assets";
+import { DoctorContext } from "../../context/DoctorContext";
+import { useContext } from "react";
 
 const DoctorLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
+   // Get context
+  const context = useContext(DoctorContext);
+  if (!context) {
+    throw new Error("DoctorLogin must be used within DoctorContextProvider");
+  }
+  const { setDToken } = context;
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,6 +25,7 @@ const DoctorLogin = () => {
       const { data } = await doctorLoginAPI(email, password);
       if (data.success) {
         localStorage.setItem("dToken", data.token);
+        setDToken(data.token);
         toast.success("Login successful!");
         navigate("/doctor/dashboard");
       } else {

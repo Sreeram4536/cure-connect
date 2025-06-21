@@ -37,6 +37,7 @@ const DoctorContextProvider = ({ children }: DoctorContextProviderProps) => {
 
     useEffect(() => {
     if (dToken) {
+       localStorage.setItem("dToken", dToken);
       loadDoctorProfileData();
     } else {
       setDoctorData(null);

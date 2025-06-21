@@ -120,7 +120,7 @@ const AdminSidebar = () => {
           </div>
           <div>
             <h1 className="text-white text-lg font-semibold">Admin Panel</h1>
-            <p className="text-slate-400 text-sm">Healthcare System</p>
+            {/* <p className="text-slate-400 text-sm">Healthcare System</p> */}
           </div>
         </div>
       </div>
